@@ -15,7 +15,7 @@ struct Args {
 
     /// Thickness of the plywood or other material
     #[arg(short, long)]
-    material_thickness: usize,
+    material_thickness: f32,
 
     /// Name of the file to save the SVG to
     #[arg(short, long)]

@@ -15,28 +15,28 @@ const SIDE_WING_SLOT_WIDTH: usize = 20;
 const SIDE_WING_SLOT_SPACING: usize = 15;
 const CLEARANCE_BETWEEN_TWO_WINGS_IN_PAIR: usize = 3;
 
-pub fn generate_svg(rows: usize, columns: usize, material_thickness: usize) -> Document {
-    let starting_point_x = 0;
-    let starting_point_y = 0;
+pub fn generate_svg(rows: usize, columns: usize, material_thickness: f32) -> Document {
+    let starting_point_x = 0.0;
+    let starting_point_y = 0.0;
     let amount_of_boxes = (rows * columns) as usize;
     let height_of_two_side_wings = height_of_two_side_wings(material_thickness);
     let height_of_two_side_wings_with_clearance =
-        (height_of_two_side_wings + CLEARANCE_BETWEEN_TWO_WINGS_IN_PAIR) as usize;
+        height_of_two_side_wings + CLEARANCE_BETWEEN_TWO_WINGS_IN_PAIR as f32;
 
     let total_width = BOX_DEPTH;
-    let total_height = amount_of_boxes * height_of_two_side_wings_with_clearance;
+    let total_height = amount_of_boxes as f32 * height_of_two_side_wings_with_clearance;
 
     let mut document = Document::new()
         .set("viewBox", (0, 0, total_width, total_height))
         .set("width", format!("{}mm", total_width))
         .set("height", format!("{}mm", total_height));
 
+    // Generate side wings
     for i in 0..amount_of_boxes {
-        dbg!(i);
-        generate_side_wings(
+        generate_side_wing_pair(
             &mut document,
             starting_point_x,
-            starting_point_y + height_of_two_side_wings_with_clearance * i,
+            starting_point_y + height_of_two_side_wings_with_clearance * i as f32,
             material_thickness,
         );
     }
@@ -47,11 +47,11 @@ pub fn generate_svg(rows: usize, columns: usize, material_thickness: usize) -> D
 fn top_width(columns: usize, material_thickness: usize) -> usize {
     ((material_thickness + BOX_WDITH_WITH_LID) * columns) + material_thickness
 }
-fn generate_side_wings(
+fn generate_side_wing_pair(
     document: &mut Document,
-    starting_point_x: usize,
-    starting_point_y: usize,
-    material_thickness: usize,
+    starting_point_x: f32,
+    starting_point_y: f32,
+    material_thickness: f32,
 ) {
     let path = generate_side_wing(
         starting_point_x,
@@ -62,21 +62,21 @@ fn generate_side_wings(
     document.append(path);
     let path = generate_side_wing(
         starting_point_x,
-        starting_point_y + SIDE_WING_WIDTH + CLEARANCE_BETWEEN_TWO_WINGS_IN_PAIR,
+        starting_point_y + (SIDE_WING_WIDTH + CLEARANCE_BETWEEN_TWO_WINGS_IN_PAIR) as f32,
         material_thickness,
         true,
     );
     document.append(path);
 }
 
-fn height_of_two_side_wings(material_thickness: usize) -> usize {
-    SIDE_WING_WIDTH * 2 + material_thickness + CLEARANCE_BETWEEN_TWO_WINGS_IN_PAIR
+fn height_of_two_side_wings(material_thickness: f32) -> f32 {
+    (SIDE_WING_WIDTH * 2 + CLEARANCE_BETWEEN_TWO_WINGS_IN_PAIR) as f32 + material_thickness
 }
 
 fn generate_side_wing(
-    starting_point_x: usize,
-    starting_point_y: usize,
-    material_thickness: usize,
+    starting_point_x: f32,
+    starting_point_y: f32,
+    material_thickness: f32,
     inverted: bool,
 ) -> Path {
     let wing_data = if inverted {
@@ -92,30 +92,30 @@ fn generate_side_wing(
 }
 
 fn generate_side_wing_path(
-    starting_point_x: usize,
-    starting_point_y: usize,
-    material_thickness: usize,
+    starting_point_x: f32,
+    starting_point_y: f32,
+    material_thickness: f32,
 ) -> Data {
     Data::new()
         .move_to((starting_point_x, starting_point_y))
-        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH)
+        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH as f32)
         .horizontal_line_to(SIDE_WING_SLOT_FROM_FRONT)
-        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH + material_thickness)
+        .vertical_line_to(starting_point_y + material_thickness + SIDE_WING_WIDTH as f32)
         .horizontal_line_to(SIDE_WING_SLOT_FROM_FRONT + SIDE_WING_SLOT_WIDTH)
-        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH)
+        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH as f32)
         .horizontal_line_to(third_side_wing_tap_position_from_front())
-        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH + material_thickness)
+        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH as f32 + material_thickness)
         .horizontal_line_to(third_side_wing_tap_position_from_front() + SIDE_WING_SLOT_WIDTH)
-        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH)
+        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH as f32)
         .horizontal_line_to(BOX_DEPTH)
         .vertical_line_to(starting_point_y)
         .close()
 }
 
 fn generate_side_wing_inverted_path(
-    starting_point_x: usize,
-    starting_point_y: usize,
-    material_thickness: usize,
+    starting_point_x: f32,
+    starting_point_y: f32,
+    material_thickness: f32,
 ) -> Data {
     Data::new()
         .move_to((starting_point_x, starting_point_y + material_thickness))
@@ -128,7 +128,7 @@ fn generate_side_wing_inverted_path(
         .horizontal_line_to(BOX_DEPTH - SIDE_WING_SLOT_FROM_FRONT)
         .vertical_line_to(starting_point_y + material_thickness)
         .horizontal_line_to(BOX_DEPTH)
-        .vertical_line_to(starting_point_y + material_thickness + SIDE_WING_WIDTH)
+        .vertical_line_to(starting_point_y + material_thickness + SIDE_WING_WIDTH as f32)
         .horizontal_line_to(starting_point_x)
         .close()
 }
