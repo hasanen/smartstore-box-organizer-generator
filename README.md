@@ -8,6 +8,19 @@ Generate to a shelf/organizer for storing Smartstore boxes:
 
 Generated SVG has been checked against files from the 3D design: https://a360.co/3P6BHQe.
 
+## Organizer
+
+![8 x 2 withn 4mm material](assets/3d_8x2_in_4mm.png)
+
+### Back supports
+
+Depending where the organizer will be put, you can print supports to add stability. Download
+
+- [back_support.stl](assets/back_support.stl)
+- [back_support.step](assets/back_support.step)
+
+![3D-printed support](assets/3d-printed_support.png)
+
 ## Usage
 
 1. Clone the repo
