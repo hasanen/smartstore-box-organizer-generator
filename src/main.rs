@@ -19,7 +19,7 @@ struct Args {
 
     /// Name of the file to save the SVG to
     #[arg(short, long)]
-    output_filename: String,
+    output_filename: Option<String>,
 
     /// Primary color of the line that will be cut first
     #[clap(short, long, default_value = "black")]
@@ -45,7 +45,14 @@ fn main() {
         &args.primary_color,
         &args.secondary_color,
     );
-    let filename = format!("{}.svg", args.output_filename);
-    svg::save(&filename, &svg).unwrap();
-    println!("Saved to {}", &filename);
+    let filename = match args.output_filename {
+        Some(name) => name,
+        None => format!(
+            "organizer_{}_rows_{}_columns_{}mm_thick",
+            args.rows, args.columns, args.material_thickness
+        ),
+    };
+    let filename_with_extension = format!("{}.svg", filename);
+    svg::save(&filename_with_extension, &svg).unwrap();
+    println!("Saved to {}", &filename_with_extension);
 }
