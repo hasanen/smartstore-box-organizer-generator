@@ -7,15 +7,15 @@ use crate::generator::generate_svg;
 struct Args {
     /// Number of rows of boxes
     #[arg(short, long)]
-    rows: u8,
+    rows: usize,
 
     /// Number columns of boxes
     #[arg(short, long)]
-    columns: u8,
+    columns: usize,
 
     /// Thickness of the plywood or other material
     #[arg(short, long)]
-    material_thickness: u8,
+    material_thickness: usize,
 
     /// Name of the file to save the SVG to
     #[arg(short, long)]
