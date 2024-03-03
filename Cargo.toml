@@ -1,6 +1,6 @@
 [package]
-name = "smartstore-box-organizer-generator"
-version = "0.1.0"
+name = "smartstore_box_organizer_generator"
+version = "0.1.1"
 edition = "2021"
 license-file = "LICENSE"
 
@@ -9,3 +9,7 @@ license-file = "LICENSE"
 [dependencies]
 clap = { version = "4.5.1", features = ["derive"] }
 svg = "0.16.0"
+
+[lib]
+name = "smartstore_box_organizer_generator"
+path = "src/lib.rs"

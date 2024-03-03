@@ -3,7 +3,6 @@ use svg::node::element::Path;
 use svg::{Document, Node};
 
 // All measurements are in mm
-const BOX_WIDTH_UNDER_LID: usize = 155;
 const BOX_WDITH_WITH_LID: usize = 174;
 const BOX_DEPTH: usize = 210;
 const BOX_BLOCK_HEIGHT: usize = 55;

@@ -121,8 +121,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "smartstore-box-organizer-generator"
-version = "0.1.0"
+name = "smartstore_box_organizer_generator"
+version = "0.1.1"
 dependencies = [
  "clap",
  "svg",

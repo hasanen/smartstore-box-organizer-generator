@@ -1,6 +1,5 @@
 use clap::Parser;
-mod generator;
-use crate::generator::generate_svg;
+use smartstore_box_organizer_generator::generate_svg;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
