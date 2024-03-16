@@ -1,6 +1,6 @@
 [package]
-name = "smartstore_box_organizer_generator"
-version = "0.1.1"
+name = "container-rack-lib"
+version = "0.2.0"
 edition = "2021"
 license-file = "LICENSE"
 
@@ -11,5 +11,5 @@ clap = { version = "4.5.1", features = ["derive"] }
 svg = "0.16.0"
 
 [lib]
-name = "smartstore_box_organizer_generator"
+name = "container_rack_lib"
 path = "src/lib.rs"
