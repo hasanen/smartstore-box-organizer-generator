@@ -9,7 +9,7 @@ pub fn supported_containers() -> Vec<Container> {
     vec![Container {
         vendor: "SmartStore".to_string(),
         model: "Classic 1".to_string(),
-        description: "Rack generated with this model also supports classic 2 and classic 3 containers. And 'Home' versions of same containers.".to_string(),
+        description: "Rack generated with this container can also have classic 2 and classic 3 containers. And 'Home' versions of same containers.".to_string(),
         links: vec![
           "https://www.orthexgroup.com/smartstore-classic/909-smartstore-classic-1-7310543520075.html".to_string(),
           "https://www.orthexgroup.com/smartstore-classic/918-smartstore-classic-2-7310543521072.html".to_string(),
