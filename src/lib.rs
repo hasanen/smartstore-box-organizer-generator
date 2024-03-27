@@ -17,7 +17,7 @@ pub fn supported_containers() -> Vec<Container> {
           ],
         width: 170,
         depth: 210,
-        block_height: 55,
+        block_height: 58,
         side_wing_from_box_top: 14,
         side_wing_width: 8,
     }]
