@@ -17,7 +17,7 @@ pub struct Container {
     pub model: String,
     pub description: String,
     pub links: Vec<String>,
-    pub width_with_lid: usize,
+    pub width: usize,
     pub depth: usize,
     pub block_height: usize,
     pub side_wing_from_box_top: usize,
@@ -34,6 +34,7 @@ pub fn generate_svg(
 ) -> Document {
     let starting_point_x = 0.0;
     let starting_point_y = 0.0;
+    let column_width = container.width + CLEARANCE_FOR_CONTAINER_WIDTH;
     let amount_of_boxes = (rows * columns) as usize;
     let height_of_two_side_wings =
         height_of_two_side_wings(container.side_wing_width, material_thickness);
@@ -41,7 +42,7 @@ pub fn generate_svg(
         height_of_two_side_wings + CLEARANCE_BETWEEN_PATHS as f32;
 
     let total_width = (container.depth + (CLEARANCE_BETWEEN_PATHS * 3)) as f32
-        + top_width(container.width_with_lid as f32, columns, material_thickness)
+        + top_width(column_width as f32, columns, material_thickness)
         + (container.block_height * rows + EXTRA_SPACE_ON_TOP_OF_TOP_SLOT) as f32
         + (2.0 * material_thickness);
     let total_height = vec![
@@ -76,6 +77,7 @@ pub fn generate_svg(
         container,
         (container.depth + CLEARANCE_BETWEEN_PATHS) as f32,
         columns,
+        column_width as f32 + material_thickness,
         material_thickness,
         primary_color,
         secondary_color,
@@ -85,7 +87,7 @@ pub fn generate_svg(
     generate_side_panels(
         &mut document,
         (container.depth + CLEARANCE_BETWEEN_PATHS) as f32 //side wings
-            + top_width(container.width_with_lid as f32, columns, material_thickness) + CLEARANCE_BETWEEN_PATHS as f32,
+            + top_width(column_width as f32, columns, material_thickness) + CLEARANCE_BETWEEN_PATHS as f32,
         container, // top and bottom plates
         rows,
         columns,
@@ -221,6 +223,7 @@ fn generate_top_and_bottom_pieces(
     container: &Container,
     starting_point_x: f32,
     columns: usize,
+    column_width: f32,
     material_thickness: f32,
     primary_color: &str,
     secondary_color: &str,
@@ -231,6 +234,7 @@ fn generate_top_and_bottom_pieces(
         starting_point_x,
         0.0,
         columns,
+        column_width,
         material_thickness,
         primary_color,
         secondary_color,
@@ -242,6 +246,7 @@ fn generate_top_and_bottom_pieces(
         starting_point_x,
         (container.depth + CLEARANCE_BETWEEN_PATHS) as f32,
         columns,
+        column_width,
         material_thickness,
         primary_color,
         secondary_color,
@@ -254,6 +259,7 @@ fn generate_cover_path(
     starting_point_x: f32,
     starting_point_y: f32,
     columns: usize,
+    column_width: f32,
     material_thickness: f32,
     primary_color: &str,
     secondary_color: &str,
@@ -264,6 +270,7 @@ fn generate_cover_path(
         starting_point_x,
         starting_point_y,
         columns,
+        column_width,
         material_thickness,
     );
     let path = Path::new()
@@ -273,8 +280,7 @@ fn generate_cover_path(
     document.append(path);
 
     for i in 0..columns - 1 {
-        let section_width = container.width_with_lid as f32 + material_thickness;
-        let x = starting_point_x + section_width + (i as f32 * section_width);
+        let x = starting_point_x + column_width + (i as f32 * column_width);
         let y = starting_point_y + SIDE_TAP_FROM_FRONT as f32;
         let side_tap_hole_path = generate_side_tap_path(x, y, material_thickness, primary_color);
         document.append(side_tap_hole_path);
@@ -310,9 +316,10 @@ fn generate_top_path(
     starting_point_x: f32,
     starting_point_y: f32,
     columns: usize,
+    column_width: f32,
     material_thickness: f32,
 ) -> Data {
-    let top_width = top_width(container.width_with_lid as f32, columns, material_thickness);
+    let top_width = top_width(column_width, columns, material_thickness);
 
     Data::new()
         .move_to((starting_point_x, starting_point_y))
@@ -342,8 +349,8 @@ fn generate_top_path(
         .close()
 }
 
-fn top_width(width_with_lid: f32, columns: usize, material_thickness: f32) -> f32 {
-    (material_thickness + width_with_lid * columns as f32) + material_thickness
+fn top_width(column_width: f32, columns: usize, material_thickness: f32) -> f32 {
+    (material_thickness + column_width * columns as f32) + material_thickness
 }
 fn generate_side_wing_pair(
     document: &mut Document,
