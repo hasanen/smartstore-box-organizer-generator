@@ -10,11 +10,13 @@ const SIDE_WING_SLOT_SPACING: usize = 15;
 const CLEARANCE_BETWEEN_PATHS: usize = 3;
 const SIDE_TAP_FROM_FRONT: usize = 30;
 const SIDE_TAP_WIDTH: usize = 30;
+const CLEARANCE_FOR_CONTAINER_WIDTH: usize = 4;
 
 pub struct Container {
     pub vendor: String,
     pub model: String,
     pub description: String,
+    pub links: Vec<String>,
     pub width_with_lid: usize,
     pub depth: usize,
     pub block_height: usize,
