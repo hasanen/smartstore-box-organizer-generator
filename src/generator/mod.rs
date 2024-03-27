@@ -3,11 +3,6 @@ use svg::node::element::Path;
 use svg::{Document, Node};
 
 // All measurements are in mm
-const BOX_WDITH_WITH_LID: usize = 174;
-const BOX_DEPTH: usize = 210;
-const BOX_BLOCK_HEIGHT: usize = 55;
-const SIDE_WING_FROM_BOX_TOP: usize = 14;
-const SIDE_WING_WIDTH: usize = 8;
 const EXTRA_SPACE_ON_TOP_OF_TOP_SLOT: usize = 3;
 const SIDE_WING_SLOT_FROM_FRONT: usize = 20;
 const SIDE_WING_SLOT_WIDTH: usize = 20;
@@ -16,28 +11,42 @@ const CLEARANCE_BETWEEN_PATHS: usize = 3;
 const SIDE_TAP_FROM_FRONT: usize = 30;
 const SIDE_TAP_WIDTH: usize = 30;
 
+// Container related constants
+
+pub struct Container {
+    pub vendor: String,
+    pub model: String,
+    pub width_with_lid: usize,
+    pub depth: usize,
+    pub block_height: usize,
+    pub side_wing_from_box_top: usize,
+    pub side_wing_width: usize,
+}
+
 pub fn generate_svg(
     rows: usize,
     columns: usize,
     material_thickness: f32,
+    container: &Container,
     primary_color: &str,
     secondary_color: &str,
 ) -> Document {
     let starting_point_x = 0.0;
     let starting_point_y = 0.0;
     let amount_of_boxes = (rows * columns) as usize;
-    let height_of_two_side_wings = height_of_two_side_wings(material_thickness);
+    let height_of_two_side_wings =
+        height_of_two_side_wings(container.side_wing_width, material_thickness);
     let height_of_two_side_wings_with_clearance =
         height_of_two_side_wings + CLEARANCE_BETWEEN_PATHS as f32;
 
-    let total_width = (BOX_DEPTH + (CLEARANCE_BETWEEN_PATHS * 3)) as f32
-        + top_width(columns, material_thickness)
-        + (BOX_BLOCK_HEIGHT * rows + EXTRA_SPACE_ON_TOP_OF_TOP_SLOT) as f32
+    let total_width = (container.depth + (CLEARANCE_BETWEEN_PATHS * 3)) as f32
+        + top_width(container.width_with_lid as f32, columns, material_thickness)
+        + (container.block_height * rows + EXTRA_SPACE_ON_TOP_OF_TOP_SLOT) as f32
         + (2.0 * material_thickness);
     let total_height = vec![
         amount_of_boxes as f32 * height_of_two_side_wings_with_clearance,
-        (2 * BOX_DEPTH + CLEARANCE_BETWEEN_PATHS) as f32,
-        ((columns + 1) * (BOX_DEPTH + CLEARANCE_BETWEEN_PATHS)) as f32,
+        (2 * container.depth + CLEARANCE_BETWEEN_PATHS) as f32,
+        ((columns + 1) * (container.depth + CLEARANCE_BETWEEN_PATHS)) as f32,
     ]
     .iter()
     .cloned()
@@ -52,6 +61,7 @@ pub fn generate_svg(
     for i in 0..amount_of_boxes {
         generate_side_wing_pair(
             &mut document,
+            container,
             starting_point_x,
             starting_point_y + height_of_two_side_wings_with_clearance * i as f32,
             material_thickness,
@@ -62,7 +72,8 @@ pub fn generate_svg(
     // Generate top and bottom pieces
     generate_top_and_bottom_pieces(
         &mut document,
-        (BOX_DEPTH + CLEARANCE_BETWEEN_PATHS) as f32,
+        container,
+        (container.depth + CLEARANCE_BETWEEN_PATHS) as f32,
         columns,
         material_thickness,
         primary_color,
@@ -72,8 +83,9 @@ pub fn generate_svg(
     // generate side panels
     generate_side_panels(
         &mut document,
-        (BOX_DEPTH + CLEARANCE_BETWEEN_PATHS) as f32 //side wings
-            + top_width(columns, material_thickness) + CLEARANCE_BETWEEN_PATHS as f32, // top and bottom plates
+        (container.depth + CLEARANCE_BETWEEN_PATHS) as f32 //side wings
+            + top_width(container.width_with_lid as f32, columns, material_thickness) + CLEARANCE_BETWEEN_PATHS as f32,
+        container, // top and bottom plates
         rows,
         columns,
         material_thickness,
@@ -87,6 +99,7 @@ pub fn generate_svg(
 fn generate_side_panels(
     document: &mut Document,
     starting_point_x: f32,
+    container: &Container,
     rows: usize,
     columns: usize,
     material_thickness: f32,
@@ -94,11 +107,12 @@ fn generate_side_panels(
     secondary_color: &str,
 ) {
     for i in 0..columns + 1 {
-        let y = (i * (BOX_DEPTH + CLEARANCE_BETWEEN_PATHS)) as f32;
+        let y = (i * (container.depth + CLEARANCE_BETWEEN_PATHS)) as f32;
 
         document.append(generate_side_panel_outline_path(
             starting_point_x,
             y,
+            container,
             rows,
             material_thickness,
             secondary_color,
@@ -106,8 +120,9 @@ fn generate_side_panels(
 
         for r in 0..rows {
             let row_x = material_thickness
-                + (EXTRA_SPACE_ON_TOP_OF_TOP_SLOT + SIDE_WING_FROM_BOX_TOP + r * BOX_BLOCK_HEIGHT)
-                    as f32;
+                + (EXTRA_SPACE_ON_TOP_OF_TOP_SLOT
+                    + container.side_wing_from_box_top
+                    + r * container.block_height) as f32;
 
             document.append(generate_side_panel_wing_holes(
                 starting_point_x + row_x,
@@ -126,7 +141,7 @@ fn generate_side_panels(
 
             document.append(generate_side_panel_wing_holes(
                 starting_point_x + row_x,
-                y + (BOX_DEPTH
+                y + (container.depth
                     - SIDE_WING_SLOT_FROM_FRONT
                     - (2 * SIDE_WING_SLOT_WIDTH)
                     - SIDE_WING_SLOT_SPACING) as f32,
@@ -135,7 +150,7 @@ fn generate_side_panels(
             ));
             document.append(generate_side_panel_wing_holes(
                 starting_point_x + row_x,
-                y + (BOX_DEPTH - SIDE_WING_SLOT_FROM_FRONT - SIDE_WING_SLOT_WIDTH) as f32,
+                y + (container.depth - SIDE_WING_SLOT_FROM_FRONT - SIDE_WING_SLOT_WIDTH) as f32,
                 material_thickness,
                 primary_color,
             ));
@@ -160,11 +175,13 @@ fn generate_side_panel_wing_holes(x: f32, y: f32, material_thickness: f32, color
 fn generate_side_panel_outline_path(
     starting_point_x: f32,
     starting_point_y: f32,
+    container: &Container,
     rows: usize,
     material_thickness: f32,
     color: &str,
 ) -> Path {
-    let panel_inner_height = (EXTRA_SPACE_ON_TOP_OF_TOP_SLOT + (BOX_BLOCK_HEIGHT * rows)) as f32;
+    let panel_inner_height =
+        (EXTRA_SPACE_ON_TOP_OF_TOP_SLOT + (container.block_height * rows)) as f32;
     let side_panel_path_data = Data::new()
         .move_to((starting_point_x + material_thickness, starting_point_y))
         .vertical_line_to(starting_point_y + SIDE_TAP_FROM_FRONT as f32)
@@ -172,17 +189,17 @@ fn generate_side_panel_outline_path(
         .vertical_line_to(starting_point_y + (SIDE_TAP_FROM_FRONT + SIDE_TAP_WIDTH) as f32)
         .horizontal_line_to(starting_point_x + material_thickness)
         .vertical_line_to(
-            starting_point_y + (BOX_DEPTH - SIDE_TAP_FROM_FRONT - SIDE_TAP_WIDTH) as f32,
+            starting_point_y + (container.depth - SIDE_TAP_FROM_FRONT - SIDE_TAP_WIDTH) as f32,
         )
         .horizontal_line_to(starting_point_x)
-        .vertical_line_to(starting_point_y + (BOX_DEPTH - SIDE_TAP_FROM_FRONT) as f32)
+        .vertical_line_to(starting_point_y + (container.depth - SIDE_TAP_FROM_FRONT) as f32)
         .horizontal_line_to(starting_point_x + material_thickness)
-        .vertical_line_to(starting_point_y + BOX_DEPTH as f32)
+        .vertical_line_to(starting_point_y + container.depth as f32)
         .horizontal_line_to(starting_point_x + panel_inner_height + (1.0 * material_thickness))
-        .vertical_line_to(starting_point_y + (BOX_DEPTH - SIDE_TAP_FROM_FRONT) as f32)
+        .vertical_line_to(starting_point_y + (container.depth - SIDE_TAP_FROM_FRONT) as f32)
         .horizontal_line_to(starting_point_x + panel_inner_height + (2.0 * material_thickness))
         .vertical_line_to(
-            starting_point_y + (BOX_DEPTH - SIDE_TAP_FROM_FRONT - SIDE_TAP_WIDTH) as f32,
+            starting_point_y + (container.depth - SIDE_TAP_FROM_FRONT - SIDE_TAP_WIDTH) as f32,
         )
         .horizontal_line_to(starting_point_x + panel_inner_height + (1.0 * material_thickness))
         .vertical_line_to(starting_point_y + (SIDE_TAP_FROM_FRONT + SIDE_TAP_WIDTH) as f32)
@@ -200,6 +217,7 @@ fn generate_side_panel_outline_path(
 
 fn generate_top_and_bottom_pieces(
     document: &mut Document,
+    container: &Container,
     starting_point_x: f32,
     columns: usize,
     material_thickness: f32,
@@ -208,6 +226,7 @@ fn generate_top_and_bottom_pieces(
 ) {
     generate_cover_path(
         document,
+        container,
         starting_point_x,
         0.0,
         columns,
@@ -218,8 +237,9 @@ fn generate_top_and_bottom_pieces(
 
     generate_cover_path(
         document,
+        container,
         starting_point_x,
-        (BOX_DEPTH + CLEARANCE_BETWEEN_PATHS) as f32,
+        (container.depth + CLEARANCE_BETWEEN_PATHS) as f32,
         columns,
         material_thickness,
         primary_color,
@@ -229,6 +249,7 @@ fn generate_top_and_bottom_pieces(
 
 fn generate_cover_path(
     document: &mut Document,
+    container: &Container,
     starting_point_x: f32,
     starting_point_y: f32,
     columns: usize,
@@ -238,6 +259,7 @@ fn generate_cover_path(
 ) {
     // Generate cover
     let top_path_data = generate_top_path(
+        container,
         starting_point_x,
         starting_point_y,
         columns,
@@ -250,7 +272,7 @@ fn generate_cover_path(
     document.append(path);
 
     for i in 0..columns - 1 {
-        let section_width = BOX_WDITH_WITH_LID as f32 + material_thickness;
+        let section_width = container.width_with_lid as f32 + material_thickness;
         let x = starting_point_x + section_width + (i as f32 * section_width);
         let y = starting_point_y + SIDE_TAP_FROM_FRONT as f32;
         let side_tap_hole_path = generate_side_tap_path(x, y, material_thickness, primary_color);
@@ -258,7 +280,7 @@ fn generate_cover_path(
 
         let side_tap_hole_path = generate_side_tap_path(
             x,
-            y + (BOX_DEPTH - SIDE_TAP_FROM_FRONT - (SIDE_TAP_WIDTH * 2)) as f32,
+            y + (container.depth - SIDE_TAP_FROM_FRONT - (SIDE_TAP_WIDTH * 2)) as f32,
             material_thickness,
             primary_color,
         );
@@ -283,12 +305,13 @@ fn generate_side_tap_path(x: f32, y: f32, material_thickness: f32, color: &str) 
 }
 
 fn generate_top_path(
+    container: &Container,
     starting_point_x: f32,
     starting_point_y: f32,
     columns: usize,
     material_thickness: f32,
 ) -> Data {
-    let top_width = top_width(columns, material_thickness);
+    let top_width = top_width(container.width_with_lid as f32, columns, material_thickness);
 
     Data::new()
         .move_to((starting_point_x, starting_point_y))
@@ -297,17 +320,17 @@ fn generate_top_path(
         .vertical_line_to(starting_point_y + (SIDE_TAP_FROM_FRONT + SIDE_TAP_WIDTH) as f32)
         .horizontal_line_to(starting_point_x)
         .vertical_line_to(
-            starting_point_y + (BOX_DEPTH - (SIDE_TAP_FROM_FRONT + SIDE_TAP_WIDTH)) as f32,
+            starting_point_y + (container.depth - (SIDE_TAP_FROM_FRONT + SIDE_TAP_WIDTH)) as f32,
         )
         .horizontal_line_to(starting_point_x + material_thickness)
-        .vertical_line_to(starting_point_y + (BOX_DEPTH - SIDE_TAP_FROM_FRONT) as f32)
+        .vertical_line_to(starting_point_y + (container.depth - SIDE_TAP_FROM_FRONT) as f32)
         .horizontal_line_to(starting_point_x)
-        .vertical_line_to(starting_point_y + BOX_DEPTH as f32)
+        .vertical_line_to(starting_point_y + container.depth as f32)
         .horizontal_line_to(starting_point_x + top_width)
-        .vertical_line_to(starting_point_y + (BOX_DEPTH - SIDE_TAP_FROM_FRONT) as f32)
+        .vertical_line_to(starting_point_y + (container.depth - SIDE_TAP_FROM_FRONT) as f32)
         .horizontal_line_to(starting_point_x - material_thickness + top_width)
         .vertical_line_to(
-            starting_point_y + (BOX_DEPTH - (SIDE_TAP_FROM_FRONT + SIDE_TAP_WIDTH)) as f32,
+            starting_point_y + (container.depth - (SIDE_TAP_FROM_FRONT + SIDE_TAP_WIDTH)) as f32,
         )
         .horizontal_line_to(starting_point_x + top_width)
         .vertical_line_to(starting_point_y + (SIDE_TAP_FROM_FRONT + SIDE_TAP_WIDTH) as f32)
@@ -318,11 +341,12 @@ fn generate_top_path(
         .close()
 }
 
-fn top_width(columns: usize, material_thickness: f32) -> f32 {
-    ((material_thickness + BOX_WDITH_WITH_LID as f32) * columns as f32) + material_thickness
+fn top_width(width_with_lid: f32, columns: usize, material_thickness: f32) -> f32 {
+    (material_thickness + width_with_lid * columns as f32) + material_thickness
 }
 fn generate_side_wing_pair(
     document: &mut Document,
+    container: &Container,
     starting_point_x: f32,
     starting_point_y: f32,
     material_thickness: f32,
@@ -332,35 +356,53 @@ fn generate_side_wing_pair(
         starting_point_x,
         starting_point_y,
         material_thickness,
+        container.depth,
+        container.side_wing_width,
         false,
         &color,
     );
     document.append(path);
     let path = generate_side_wing(
         starting_point_x,
-        starting_point_y + (SIDE_WING_WIDTH + CLEARANCE_BETWEEN_PATHS) as f32,
+        starting_point_y + (container.side_wing_width + CLEARANCE_BETWEEN_PATHS) as f32,
         material_thickness,
+        container.depth,
+        container.side_wing_width,
         true,
         &color,
     );
     document.append(path);
 }
 
-fn height_of_two_side_wings(material_thickness: f32) -> f32 {
-    (SIDE_WING_WIDTH * 2 + CLEARANCE_BETWEEN_PATHS) as f32 + material_thickness
+fn height_of_two_side_wings(side_wing_width: usize, material_thickness: f32) -> f32 {
+    (side_wing_width * 2 + CLEARANCE_BETWEEN_PATHS) as f32 + material_thickness
 }
 
 fn generate_side_wing(
     starting_point_x: f32,
     starting_point_y: f32,
     material_thickness: f32,
+    box_depth: usize,
+    box_side_wing_width: usize,
     inverted: bool,
     color: &str,
 ) -> Path {
     let wing_data = if inverted {
-        generate_side_wing_inverted_path(starting_point_x, starting_point_y, material_thickness)
+        generate_side_wing_inverted_path(
+            starting_point_x,
+            starting_point_y,
+            material_thickness,
+            box_depth,
+            box_side_wing_width,
+        )
     } else {
-        generate_side_wing_path(starting_point_x, starting_point_y, material_thickness)
+        generate_side_wing_path(
+            starting_point_x,
+            starting_point_y,
+            material_thickness,
+            box_depth,
+            box_side_wing_width,
+        )
     };
 
     svg::node::element::Path::new()
@@ -373,19 +415,23 @@ fn generate_side_wing_path(
     starting_point_x: f32,
     starting_point_y: f32,
     material_thickness: f32,
+    box_depth: usize,
+    box_side_wing_width: usize,
 ) -> Data {
     Data::new()
         .move_to((starting_point_x, starting_point_y))
-        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH as f32)
+        .vertical_line_to(starting_point_y + box_side_wing_width as f32)
         .horizontal_line_to(SIDE_WING_SLOT_FROM_FRONT)
-        .vertical_line_to(starting_point_y + material_thickness + SIDE_WING_WIDTH as f32)
+        .vertical_line_to(starting_point_y + material_thickness + box_side_wing_width as f32)
         .horizontal_line_to(SIDE_WING_SLOT_FROM_FRONT + SIDE_WING_SLOT_WIDTH)
-        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH as f32)
-        .horizontal_line_to(third_side_wing_tap_position_from_front())
-        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH as f32 + material_thickness)
-        .horizontal_line_to(third_side_wing_tap_position_from_front() + SIDE_WING_SLOT_WIDTH)
-        .vertical_line_to(starting_point_y + SIDE_WING_WIDTH as f32)
-        .horizontal_line_to(BOX_DEPTH)
+        .vertical_line_to(starting_point_y + box_side_wing_width as f32)
+        .horizontal_line_to(third_side_wing_tap_position_from_front(box_depth))
+        .vertical_line_to(starting_point_y + box_side_wing_width as f32 + material_thickness)
+        .horizontal_line_to(
+            third_side_wing_tap_position_from_front(box_depth) + SIDE_WING_SLOT_WIDTH,
+        )
+        .vertical_line_to(starting_point_y + box_side_wing_width as f32)
+        .horizontal_line_to(box_depth)
         .vertical_line_to(starting_point_y)
         .close()
 }
@@ -394,6 +440,8 @@ fn generate_side_wing_inverted_path(
     starting_point_x: f32,
     starting_point_y: f32,
     material_thickness: f32,
+    box_depth: usize,
+    box_side_wing_width: usize,
 ) -> Data {
     Data::new()
         .move_to((starting_point_x, starting_point_y + material_thickness))
@@ -401,18 +449,18 @@ fn generate_side_wing_inverted_path(
         .vertical_line_to(starting_point_y)
         .horizontal_line_to(second_side_wing_tap_position_from_front() + SIDE_WING_SLOT_WIDTH)
         .vertical_line_to(starting_point_y + material_thickness)
-        .horizontal_line_to(fourth_side_wing_tap_position_from_front())
+        .horizontal_line_to(fourth_side_wing_tap_position_from_front(box_depth))
         .vertical_line_to(starting_point_y)
-        .horizontal_line_to(BOX_DEPTH - SIDE_WING_SLOT_FROM_FRONT)
+        .horizontal_line_to(box_depth - SIDE_WING_SLOT_FROM_FRONT)
         .vertical_line_to(starting_point_y + material_thickness)
-        .horizontal_line_to(BOX_DEPTH)
-        .vertical_line_to(starting_point_y + material_thickness + SIDE_WING_WIDTH as f32)
+        .horizontal_line_to(box_depth)
+        .vertical_line_to(starting_point_y + material_thickness + box_side_wing_width as f32)
         .horizontal_line_to(starting_point_x)
         .close()
 }
 
-fn third_side_wing_tap_position_from_front() -> usize {
-    BOX_DEPTH
+fn third_side_wing_tap_position_from_front(box_depth: usize) -> usize {
+    box_depth
         - (SIDE_WING_SLOT_FROM_FRONT
             + SIDE_WING_SLOT_WIDTH
             + SIDE_WING_SLOT_SPACING
@@ -422,6 +470,6 @@ fn second_side_wing_tap_position_from_front() -> usize {
     SIDE_WING_SLOT_FROM_FRONT + SIDE_WING_SLOT_WIDTH + SIDE_WING_SLOT_SPACING
 }
 
-fn fourth_side_wing_tap_position_from_front() -> usize {
-    BOX_DEPTH - (SIDE_WING_SLOT_FROM_FRONT + SIDE_WING_SLOT_WIDTH)
+fn fourth_side_wing_tap_position_from_front(box_depth: usize) -> usize {
+    box_depth - (SIDE_WING_SLOT_FROM_FRONT + SIDE_WING_SLOT_WIDTH)
 }
