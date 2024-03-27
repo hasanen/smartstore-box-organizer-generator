@@ -1,7 +1,7 @@
 mod generator;
 use std::vec;
 
-use generator::Container;
+use generator::{Container, Dimensions};
 
 pub use crate::generator::generate_svg;
 
@@ -15,10 +15,12 @@ pub fn supported_containers() -> Vec<Container> {
           "https://www.orthexgroup.com/smartstore-classic/918-smartstore-classic-2-7310543521072.html".to_string(),
           "https://www.orthexgroup.com/smartstore-classic/919-smartstore-classic-3-7310543522079.html".to_string(),
           ],
-        width: 170,
-        depth: 210,
-        height: 58,
-        side_wing_from_box_top: 17,
-        side_wing_width: 8,
+          dimensions: Dimensions {
+            width: 170,
+            depth: 210,
+            height: 58,
+            side_wing_from_box_top: 17,
+            side_wing_width: 8,
+          }
     }]
 }
