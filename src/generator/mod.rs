@@ -3,7 +3,6 @@ use svg::node::element::Path;
 use svg::{Document, Node};
 
 // All measurements are in mm
-const EXTRA_SPACE_ON_TOP_OF_TOP_SLOT: usize = 3;
 const SIDE_WING_SLOT_FROM_FRONT: usize = 20;
 const SIDE_WING_SLOT_WIDTH: usize = 20;
 const SIDE_WING_SLOT_SPACING: usize = 15;
@@ -43,7 +42,7 @@ pub fn generate_svg(
 
     let total_width = (container.depth + (CLEARANCE_BETWEEN_PATHS * 3)) as f32
         + top_width(column_width as f32, columns, material_thickness)
-        + (container.block_height * rows + EXTRA_SPACE_ON_TOP_OF_TOP_SLOT) as f32
+        + (container.block_height * rows) as f32
         + (2.0 * material_thickness);
     let total_height = vec![
         amount_of_boxes as f32 * height_of_two_side_wings_with_clearance,
@@ -123,9 +122,7 @@ fn generate_side_panels(
 
         for r in 0..rows {
             let row_x = material_thickness
-                + (EXTRA_SPACE_ON_TOP_OF_TOP_SLOT
-                    + container.side_wing_from_box_top
-                    + r * container.block_height) as f32;
+                + (container.side_wing_from_box_top + r * container.block_height) as f32;
 
             document.append(generate_side_panel_wing_holes(
                 starting_point_x + row_x,
@@ -183,8 +180,7 @@ fn generate_side_panel_outline_path(
     material_thickness: f32,
     color: &str,
 ) -> Path {
-    let panel_inner_height =
-        (EXTRA_SPACE_ON_TOP_OF_TOP_SLOT + (container.block_height * rows)) as f32;
+    let panel_inner_height = (container.block_height * rows) as f32;
     let side_panel_path_data = Data::new()
         .move_to((starting_point_x + material_thickness, starting_point_y))
         .vertical_line_to(starting_point_y + SIDE_TAP_FROM_FRONT as f32)
