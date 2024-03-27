@@ -11,11 +11,10 @@ const CLEARANCE_BETWEEN_PATHS: usize = 3;
 const SIDE_TAP_FROM_FRONT: usize = 30;
 const SIDE_TAP_WIDTH: usize = 30;
 
-// Container related constants
-
 pub struct Container {
     pub vendor: String,
     pub model: String,
+    pub description: String,
     pub width_with_lid: usize,
     pub depth: usize,
     pub block_height: usize,
