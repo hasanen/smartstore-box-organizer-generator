@@ -18,8 +18,8 @@ pub fn supported_containers() -> Vec<Container> {
           dimensions: Dimensions {
             width: 170,
             depth: 210,
-            height: 58,
-            side_wing_from_box_top: 17,
+            height: 56,
+            side_wing_from_box_top: 15,
             side_wing_width: 8,
           }
     }]
