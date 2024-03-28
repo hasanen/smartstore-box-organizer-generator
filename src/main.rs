@@ -1,5 +1,5 @@
 use clap::Parser;
-use container_rack_lib::generate_svg;
+use container_rack_lib::{generate_svg, supported_containers};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -36,11 +36,22 @@ fn main() {
         "So you want to generate organizer with {} rows and {} columns, using {}mm thick material.",
         args.rows, args.columns, args.material_thickness
     );
+    let supported_containers = supported_containers();
+
+    let container = match supported_containers.get(0) {
+        Some(container) => container,
+        None => {
+            println!("No supported containers found.");
+            //exit from process
+            std::process::exit(1);
+        }
+    };
 
     let svg = generate_svg(
         args.rows,
         args.columns,
         args.material_thickness,
+        &container,
         &args.primary_color,
         &args.secondary_color,
     );
