@@ -8,16 +8,16 @@ Generate to a shelf/organizer for storing Smartstore boxes:
 
 Generated SVG has been checked against files from the 3D design: https://a360.co/3P6BHQe.
 
-## Organizer
+## Rack
 
 ![8 x 2 withn 4mm material](assets/3d_8x2_in_4mm.png)
 
 ### Back supports
 
-Depending where the organizer will be put, you can print supports to add stability. Download
+If you don't plan to build housing for the rack or put a back plate, you can 3D print support to be attached in the back:
 
-- [back_support.stl](assets/back_support.stl)
-- [back_support.step](assets/back_support.step)
+- [back_support_174mm_wide_column.stl](assets/back_support_174mm_wide_column.stl)
+- [back_support_174mm_wide_column.step](assets/back_support_174mm_wide_column.step)
 
 ![3D-printed support](assets/3d-printed_support.png)
 
@@ -27,5 +27,5 @@ Depending where the organizer will be put, you can print supports to add stabili
 2. Generate SVG
 
 ```bash
-cargo run -- --rows 8 --columns 3 --material-thickness 4
+cargo run -- generate --rows 8 --columns 3 --material-thickness 4
 ```
