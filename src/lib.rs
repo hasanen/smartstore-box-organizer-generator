@@ -1,9 +1,9 @@
-mod generator;
+mod rack;
 use std::vec;
 
-use generator::{Container, Dimensions};
+use rack::{Container, Dimensions};
 
-pub use crate::generator::generate_svg;
+pub use crate::rack::generate_svg;
 
 pub fn supported_containers() -> Vec<Container> {
     vec![Container {
