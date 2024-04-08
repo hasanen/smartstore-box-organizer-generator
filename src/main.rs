@@ -1,9 +1,26 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use container_rack_lib::{generate_svg, supported_containers};
 
 #[derive(Parser, Debug)]
+#[structopt(name = "Container rack")]
+#[command(arg_required_else_help(true))]
+struct Cli {
+    /// Command to use: hours, integrations etc
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand, Debug)]
+enum Commands {
+    /// Generate SVG
+    Generate(GenerateArgs),
+    /// List supported containers
+    Containers,
+}
+
+#[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
-struct Args {
+struct GenerateArgs {
     /// Number of rows of boxes
     #[arg(short, long)]
     rows: usize,
@@ -30,39 +47,46 @@ struct Args {
 }
 
 fn main() {
-    let args = Args::parse();
+    let args = Cli::parse();
 
-    println!(
-        "So you want to generate organizer with {} rows and {} columns, using {}mm thick material.",
-        args.rows, args.columns, args.material_thickness
-    );
-    let supported_containers = supported_containers();
+    match &args.command {
+        Commands::Generate(args) => {
+            println!(
+                "So you want to generate organizer with {} rows and {} columns, using {}mm thick material.",
+                args.rows, args.columns, args.material_thickness
+            );
+            let supported_containers = supported_containers();
 
-    let container = match supported_containers.get(0) {
-        Some(container) => container,
-        None => {
-            println!("No supported containers found.");
-            //exit from process
-            std::process::exit(1);
+            let container = match supported_containers.get(0) {
+                Some(container) => container,
+                None => {
+                    println!("No supported containers found.");
+                    //exit from process
+                    std::process::exit(1);
+                }
+            };
+
+            let svg = generate_svg(
+                args.rows,
+                args.columns,
+                args.material_thickness,
+                &container,
+                &args.primary_color,
+                &args.secondary_color,
+            );
+            let filename = match args.output_filename.clone() {
+                Some(name) => name,
+                None => format!(
+                    "organizer_{}_rows_{}_columns_{}mm_thick",
+                    args.rows, args.columns, args.material_thickness
+                ),
+            };
+            let filename_with_extension = format!("{}.svg", filename);
+            svg::save(&filename_with_extension, &svg).unwrap();
+            println!("Saved to {}", &filename_with_extension);
         }
-    };
-
-    let svg = generate_svg(
-        args.rows,
-        args.columns,
-        args.material_thickness,
-        &container,
-        &args.primary_color,
-        &args.secondary_color,
-    );
-    let filename = match args.output_filename {
-        Some(name) => name,
-        None => format!(
-            "organizer_{}_rows_{}_columns_{}mm_thick",
-            args.rows, args.columns, args.material_thickness
-        ),
-    };
-    let filename_with_extension = format!("{}.svg", filename);
-    svg::save(&filename_with_extension, &svg).unwrap();
-    println!("Saved to {}", &filename_with_extension);
+        Commands::Containers => {
+            println!("list containers - TBD");
+        }
+    }
 }
