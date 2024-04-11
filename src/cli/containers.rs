@@ -36,7 +36,14 @@ impl ToTableRow for Container {
             Cell::new(&self.vendor),
             Cell::new(&self.model),
             Cell::new(&self.description).truncate(40),
-            Cell::new(&self.links.join("\n")),
+            Cell::new(
+                &self
+                    .links
+                    .iter()
+                    .map(|link| link.url.to_string())
+                    .collect::<Vec<String>>()
+                    .join("\n"),
+            ),
         ]
     }
 }

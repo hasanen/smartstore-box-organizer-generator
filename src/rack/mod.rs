@@ -1,6 +1,7 @@
 use svg::node::element::path::Data;
 use svg::node::element::Path;
 use svg::{Document, Node};
+use url::Url;
 
 // All measurements are in mm
 const SIDE_WING_SLOT_FROM_FRONT: usize = 20;
@@ -16,7 +17,7 @@ pub struct Container {
     pub vendor: String,
     pub model: String,
     pub description: String,
-    pub links: Vec<String>,
+    pub links: Vec<ContainerLink>,
     pub dimensions: Dimensions,
 }
 
@@ -37,6 +38,11 @@ pub struct Dimensions {
     pub side_wing_width: usize,
 }
 
+#[derive(Debug, Clone)]
+pub struct ContainerLink {
+    pub url: Url,
+    pub title: String,
+}
 pub fn generate_svg(
     rows: usize,
     columns: usize,
