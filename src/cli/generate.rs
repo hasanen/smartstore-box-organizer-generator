@@ -1,5 +1,4 @@
 use clap::Parser;
-use container_rack_lib::rack::Container;
 use container_rack_lib::{generate_svg, supported_containers};
 
 #[derive(Parser, Debug)]

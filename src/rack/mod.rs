@@ -11,6 +11,7 @@ const SIDE_TAP_FROM_FRONT: usize = 30;
 const SIDE_TAP_WIDTH: usize = 30;
 const CLEARANCE_FOR_CONTAINER_WIDTH: usize = 4;
 
+#[derive(Debug, Clone)]
 pub struct Container {
     pub vendor: String,
     pub model: String,
@@ -27,6 +28,7 @@ impl Container {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Dimensions {
     pub width: usize,
     pub depth: usize,
