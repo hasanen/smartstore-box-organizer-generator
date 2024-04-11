@@ -17,6 +17,7 @@ pub fn print_containers() {
 
 fn table_header() -> Vec<Cell> {
     vec![
+        Cell::new("Key"),
         Cell::new("Brand"),
         Cell::new("Model"),
         Cell::new("Description"),
@@ -31,6 +32,7 @@ trait ToTableRow {
 impl ToTableRow for Container {
     fn to_table_row(&self) -> Vec<Cell> {
         vec![
+            Cell::new(&self.key()),
             Cell::new(&self.vendor),
             Cell::new(&self.model),
             Cell::new(&self.description).truncate(40),

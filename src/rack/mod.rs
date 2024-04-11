@@ -19,6 +19,14 @@ pub struct Container {
     pub dimensions: Dimensions,
 }
 
+impl Container {
+    pub fn key(&self) -> String {
+        format!("{}-{}", self.vendor, self.model)
+            .to_lowercase()
+            .replace(" ", "_")
+    }
+}
+
 pub struct Dimensions {
     pub width: usize,
     pub depth: usize,

@@ -1,4 +1,5 @@
 use clap::Parser;
+use container_rack_lib::rack::Container;
 use container_rack_lib::{generate_svg, supported_containers};
 
 #[derive(Parser, Debug)]
@@ -15,6 +16,10 @@ pub struct RackGenerationArgs {
     /// Thickness of the plywood or other material
     #[arg(short, long)]
     material_thickness: f32,
+
+    /// Key of container
+    #[arg(long)]
+    container: String,
 
     /// Name of the file to save the SVG to
     #[arg(short, long)]
@@ -37,7 +42,10 @@ pub fn svg(args: &RackGenerationArgs) {
     );
     let supported_containers = supported_containers();
 
-    let container = match supported_containers.get(0) {
+    let container = match supported_containers
+        .iter()
+        .find(|c| c.key() == args.container)
+    {
         Some(container) => container,
         None => {
             println!("No supported containers found.");
@@ -57,8 +65,11 @@ pub fn svg(args: &RackGenerationArgs) {
     let filename = match args.output_filename.clone() {
         Some(name) => name,
         None => format!(
-            "organizer_{}_rows_{}_columns_{}mm_thick",
-            args.rows, args.columns, args.material_thickness
+            "organizer_{}_rows_{}_columns_{}mm_thick_{}",
+            args.rows,
+            args.columns,
+            args.material_thickness,
+            container.key()
         ),
     };
     let filename_with_extension = format!("{}.svg", filename);
