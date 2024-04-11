@@ -2,6 +2,7 @@ use clap::{Parser, Subcommand};
 
 pub mod generate;
 use generate::RackGenerationArgs;
+pub mod containers;
 
 #[derive(Parser, Debug)]
 #[structopt(name = "Container rack")]
@@ -28,7 +29,7 @@ pub fn run() {
             generate::svg(args);
         }
         Commands::Containers => {
-            println!("list containers - TBD");
+            containers::print_containers();
         }
     }
 }

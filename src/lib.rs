@@ -1,4 +1,4 @@
-mod rack;
+pub mod rack;
 use std::vec;
 
 use rack::{Container, Dimensions};
