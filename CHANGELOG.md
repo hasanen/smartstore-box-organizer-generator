@@ -4,6 +4,10 @@
 
 TBD
 
+## 0.3.2 - 2024-10-13
+
+- Added URL for the web UI to README
+
 ## 0.3.1 - 2024-10-13
 
 - Updated installation and usage instractions in README
