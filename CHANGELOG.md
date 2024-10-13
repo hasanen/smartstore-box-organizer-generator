@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.3.0/main - YYYY-MM-DD
+## `main` branch- YYYY-MM-DD
+
+TBD
+
+## 0.3.0 - 2024-10-13
 
 - Refactor default generation command to own `generate` command. Added command to list supported containers.
 - New reqquired argument for generation command: `--containers`
