@@ -4,6 +4,10 @@
 
 TBD
 
+## 0.3.1 - 2024-10-13
+
+- Updated installation and usage instractions in README
+
 ## 0.3.0 - 2024-10-13
 
 - Refactor default generation command to own `generate` command. Added command to list supported containers.
