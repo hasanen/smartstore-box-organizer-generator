@@ -21,11 +21,22 @@ If you don't plan to build housing for the rack or put a back plate, you can 3D 
 
 ![3D-printed support](assets/3d-printed_support.png)
 
-## Usage
-
-1. Clone the repo
-2. Generate SVG
+## Installation
 
 ```bash
-cargo run -- generate --rows 8 --columns 3 --material-thickness 4
+cargo install container-rack-lib
+```
+
+## Usage
+
+Check supported containers
+
+```bash
+container-rack-lib containers
+```
+
+Generate SVG
+
+```bash
+container-rack-lib generate --rows 8 --columns 3 --material-thickness 4 --container smartstore-classic_1
 ```
