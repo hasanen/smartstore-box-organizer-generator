@@ -8,6 +8,8 @@ Generate to a shelf/organizer for storing Smartstore boxes:
 
 Generated SVG has been checked against files from the 3D design: https://a360.co/3P6BHQe.
 
+You can also use web UI https://container-rack.diy
+
 ## Rack
 
 ![8 x 2 withn 4mm material](assets/3d_8x2_in_4mm.png)
